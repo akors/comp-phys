@@ -1,5 +1,6 @@
 set terminal png
-plot "02_pendulum.dat" using 1:3 title "Euler", \
-    "02_pendulum.dat" using 1:4 title "Runge-Kutta 4", \
-    "02_pendulum.dat" using 1:2 title "Analytic" with lines
+plot "02_pendulum.dat" using 1:2 title "\\theta (Euler)" with lines, \
+     "02_pendulum.dat" using 1:3 title "\\dottheta (Euler) " with lines, \
+     "02_pendulum.dat" using 1:4 title "\\theta (Runge-Kutta 4)" with lines, \
+     "02_pendulum.dat" using 1:5 title "\\dottheta (Runge-Kutta 4)" with lines
 

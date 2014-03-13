@@ -14,11 +14,10 @@
 static std::map<std::string, double> params {
         {"stepsize", 0.001},
         {"t_init", 0.0}, // initial conditions
-        {"y_init", 1.0},
-        {"t_end", 3},
-        {"theta0", 0},
-        {"dotheta0", 2*M_PI},
-        {"k_exp", 1.0}
+        {"t_end", 15},
+        {"y1_init", 0},
+        {"y2_init", 2},
+        {"omega", 1}
 };
 
 
@@ -109,15 +108,21 @@ struct solver_RungeKutta4
 };
 
 #if 0
-double dglfunc_exponential(double /* t */, double y)
-{
-    return params["k_exp"]*y;
-}
-#endif
 
 std::valarray<double> dglfunc_exponential(double /* t */, std::valarray<double> y)
 {
     return params["k_exp"] * y;
+}
+#endif
+
+std::valarray<double> dglfunc_pendel(double /* t */, std::valarray<double> y)
+{
+    std::valarray<double> ret(2);
+
+    ret[0] = y[1];
+    ret[1] = - params["omega"] * std::sin(y[0]);
+
+    return ret;
 }
 
 int main()
@@ -139,26 +144,27 @@ int main()
     for (auto p_it = params.begin(); p_it != params.end(); ++p_it)
         std::cout<<"# "<<p_it->first<<" = "<<p_it->second<<'\n';
 
-    auto y_init = std::valarray<double>{params["y_init"]};
+    double t = params["t_init"], timestep = params["stepsize"];
+    std::valarray<double> y_init = {params["y1_init"], params["y2_init"]};
 
-    solver_euler<std::valarray<double>, decltype(dglfunc_exponential)*> s_euler(
-        dglfunc_exponential, params["t_init"], y_init
+    solver_euler<std::valarray<double>, decltype(dglfunc_pendel)*> s_euler(
+        dglfunc_pendel, t, y_init
     );
-    solver_RungeKutta4<std::valarray<double>, decltype(dglfunc_exponential)*> s_rk4(
-        dglfunc_exponential, params["t_init"], y_init
+    solver_RungeKutta4<std::valarray<double>, decltype(dglfunc_pendel)*> s_rk4(
+        dglfunc_pendel, t, y_init
     );
 
     std::cout<<"# Writing data for in ["<<params["t_init"]<<", "<< params["t_end"]<<") with delta = "<<params["stepsize"]<<'\n';
     std::cout<<std::scientific;
 
-    double t = params["t_init"], timestep = params["stepsize"];
     while(t < params["t_end"])
     {
         std::cout<<
                 t<<"  "<<
-                params["y_init"] * std::exp(params["k_exp"]*t)<<"  "<<
                 s_euler.step(timestep)[0]<<"  "<<
-                s_rk4.step(timestep)[0]<<
+                s_euler.step(timestep)[1]<<"  "<<
+                s_rk4.step(timestep)[0]<<"  "<<
+                s_rk4.step(timestep)[1]<<
                 '\n';
         t += timestep;
     }
