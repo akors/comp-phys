@@ -77,6 +77,38 @@ struct solver_euler
     }
 };
 
+template <typename T, typename F> 
+struct solver_RungeKutta4
+{
+    T t_cur, y_cur; // current t/y values
+    F f; // functor depending on t,y
+
+    // initializing constructor
+    solver_RungeKutta4(const F& func, T t_init, T y_init)
+        : f(func), t_cur(t_init), y_cur(y_init)
+    {     
+    }
+
+    // no default-construction!
+    solver_RungeKutta4() = delete;
+
+    T step(double timestep)
+    {
+        T k1, k2, k3, k4;
+
+        k1 = f(t_cur             , y_cur                  );
+        k2 = f(t_cur + timestep/2, y_cur + timestep/2 * k1);
+        k3 = f(t_cur + timestep/2, y_cur + timestep/2 * k2);
+        k4 = f(t_cur + timestep  , y_cur + timestep   * k3);
+
+        y_cur = y_cur + timestep/6*(k1 + 2*k2 + 2*k3 + k4);
+
+        t_cur += timestep;
+        return y_cur;
+    }
+};
+
+
 double dglfunc_exponential(double /* t */, double y)
 {
     return params["k_exp"]*y;
@@ -104,6 +136,9 @@ int main()
     solver_euler<double, decltype(dglfunc_exponential)*> s_euler(
         dglfunc_exponential, params["t_init"], params["y_init"]
     );
+    solver_RungeKutta4<double, decltype(dglfunc_exponential)*> s_rk4(
+        dglfunc_exponential, params["t_init"], params["y_init"]
+    );
 
     std::cout<<"# Writing data for in ["<<params["t_init"]<<", "<< params["t_end"]<<") with delta = "<<params["stepsize"]<<'\n';
     std::cout<<std::scientific;
@@ -114,7 +149,8 @@ int main()
         std::cout<<
                 t<<"  "<<
                 params["y_init"] * std::exp(params["k_exp"]*t)<<"  "<<
-                s_euler.step(timestep)<<
+                s_euler.step(timestep)<<"  "<<
+                s_rk4.step(timestep)<<
                 '\n';
         t += timestep;
     }
