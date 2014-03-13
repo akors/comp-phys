@@ -18,7 +18,7 @@ static std::map<std::string, double> params {
         {"t_end", 3},
         {"theta0", 0},
         {"dotheta0", 2*M_PI},
-        {"k_exp", 0.33}
+        {"k_exp", 1.0}
 };
 
 
@@ -111,7 +111,11 @@ int main()
     double t = params["t_init"], timestep = params["stepsize"];
     while(t < params["t_end"])
     {
-        std::cout<<t<<"  "<<s_euler.step(timestep)<<'\n';
+        std::cout<<
+                t<<"  "<<
+                params["y_init"] * std::exp(params["k_exp"]*t)<<"  "<<
+                s_euler.step(timestep)<<
+                '\n';
         t += timestep;
     }
 
