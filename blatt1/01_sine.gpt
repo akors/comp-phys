@@ -1,0 +1,3 @@
+set terminal png
+plot "01_sine.dat"
+

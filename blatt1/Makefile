@@ -1,14 +1,22 @@
 
 CXXFLAGS += -std=c++0x
 
-all: plot pendulum
+MODULES := 01_sine 02_pendulum
 
-plot: sine.dat plot.gpt
-	gnuplot plot.gpt
+all: $(MODULES)
 
-sine.dat: writesin
-	./writesin > $@
+plots: $(addsuffix .png, $(MODULES))
+
+%.png: %.gpt %.dat 
+	gnuplot $< > $@
+
+
+$(addsuffix .dat, $(MODULES)) : %.dat : %.prm %
+	./$* > $@
+
 
 clean:
-	$(RM) writesin pendulum
-	$(RM) sine.dat sine.png
+	$(RM) *.png
+	$(RM) *.dat
+	$(RM) $(MODULES) 
+

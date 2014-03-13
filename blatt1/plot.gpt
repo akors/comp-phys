@@ -1,4 +1,0 @@
-set terminal png
-set output "sine.png"
-plot "sine.dat"
-

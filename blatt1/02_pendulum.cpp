@@ -84,7 +84,7 @@ double dglfunc_exponential(double /* t */, double y)
 
 int main()
 {
-    std::ifstream parmfile("params.txt");
+    std::ifstream parmfile("02_pendulum.prm");
     if (!parmfile)
     {
         perror("Failed to open parameter file");
