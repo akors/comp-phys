@@ -5,10 +5,12 @@ MODULES := 01_sine 02_pendulum
 
 all: $(MODULES)
 
-plots: $(addsuffix .png, $(MODULES))
+plots: $(addsuffix -plot, $(MODULES))
 
-%.png: %.gpt %.dat 
-	gnuplot $< > $@
+.PHONY: $(addsuffix -plot, $(MODULES))
+
+$(addsuffix -plot, $(MODULES)) : %-plot : %.gpt %.dat
+	gnuplot $<
 
 
 $(addsuffix .dat, $(MODULES)) : %.dat : %.prm %

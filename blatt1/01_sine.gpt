@@ -1,3 +1,4 @@
 set terminal png
+set output "01_sine.png"
 plot "01_sine.dat"
 
