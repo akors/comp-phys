@@ -12,9 +12,9 @@
 
 // initialize with default paramters
 static std::map<std::string, double> params {
-        {"stepsize", 0.001},
+        {"stepsize", 0.01},
         {"t_init", 0.0}, // initial conditions
-        {"t_end", 15},
+        {"t_end", 50},
         {"y1_init", 0},
         {"y2_init", 2},
         {"omega", 1}
@@ -96,11 +96,11 @@ struct solver_RungeKutta4
     T step(double timestep)
     {
         T k1 = f(t_cur             , y_cur                  );
-        T k2 = f(t_cur + timestep/2, y_cur + timestep/2 * k1);
-        T k3 = f(t_cur + timestep/2, y_cur + timestep/2 * k2);
+        T k2 = f(t_cur + timestep/2.0, y_cur + timestep/2.0 * k1);
+        T k3 = f(t_cur + timestep/2.0, y_cur + timestep/2.0 * k2);
         T k4 = f(t_cur + timestep  , y_cur + timestep   * k3);
 
-        y_cur = y_cur + timestep/6*(k1 + 2.0*k2 + 2.0*k3 + k4);
+        y_cur = y_cur + timestep/6.0*(k1 + 2.0*k2 + 2.0*k3 + k4);
 
         t_cur += timestep;
         return y_cur;
@@ -159,13 +159,14 @@ int main()
 
     while(t < params["t_end"])
     {
+        s_euler.step(timestep);
+        s_rk4.step(timestep);
+    
         std::cout<<
-                t<<"  "<<
-                s_euler.step(timestep)[0]<<"  "<<
-                s_euler.step(timestep)[1]<<"  "<<
-                s_rk4.step(timestep)[0]<<"  "<<
-                s_rk4.step(timestep)[1]<<
-                '\n';
+            t<<"  "<<s_euler.y_cur[0]<<"  "<<s_euler.y_cur[1]
+            <<"  "<<s_rk4.y_cur[0]<<"  "<<s_rk4.y_cur[1]
+            <<'\n';
+
         t += timestep;
     }
 
