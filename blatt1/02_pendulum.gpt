@@ -1,9 +1,12 @@
 set terminal png
 set output "02_pendulum-euler.png"
 plot "02_pendulum.dat" using 1:2 title "\\theta (Euler)" with lines, \
-     "02_pendulum.dat" using 1:3 title "\\dottheta (Euler) " with lines
+     "02_pendulum.dat" using 1:3 title "\\dottheta (Euler) " with lines, \
+     "02_pendulum.dat" using 1:4 title "Energy (Euler)" with lines
+     
 set output "02_pendulum-rk4.png"
-plot "02_pendulum.dat" using 1:4 title "\\theta (Runge-Kutta 4)" with lines, \
-     "02_pendulum.dat" using 1:5 title "\\dottheta (Runge-Kutta 4)" with lines
+plot "02_pendulum.dat" using 1:5 title "\\theta (Runge-Kutta 4)" with lines, \
+     "02_pendulum.dat" using 1:6 title "\\dottheta (Runge-Kutta 4)" with lines, \
+     "02_pendulum.dat" using 1:7 title "Energy (Runge-Kutta 4)" with lines
 
 

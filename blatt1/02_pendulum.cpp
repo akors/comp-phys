@@ -125,6 +125,11 @@ std::valarray<double> dglfunc_pendel(double /* t */, std::valarray<double> y)
     return ret;
 }
 
+double energy(std::valarray<double> y)
+{
+    return (1 - std::cos(y[0])) + y[1]*y[1]/2;
+}
+
 int main()
 {
     std::ifstream parmfile("02_pendulum.prm");
@@ -163,8 +168,8 @@ int main()
         s_rk4.step(timestep);
     
         std::cout<<
-            t<<"  "<<s_euler.y_cur[0]<<"  "<<s_euler.y_cur[1]
-            <<"  "<<s_rk4.y_cur[0]<<"  "<<s_rk4.y_cur[1]
+            t<<"  "<<s_euler.y_cur[0]<<"  "<<s_euler.y_cur[1]<<"  "<<energy(s_euler.y_cur)
+            <<"  "<<s_rk4.y_cur[0]<<"  "<<s_rk4.y_cur[1]<<"  "<<energy(s_rk4.y_cur)
             <<'\n';
 
         t += timestep;
