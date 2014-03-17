@@ -95,10 +95,10 @@ struct solver_RungeKutta4
 
     T step(double timestep)
     {
-        T k1 = f(t_cur             , y_cur                  );
+        T k1 = f(t_cur               , y_cur                    );
         T k2 = f(t_cur + timestep/2.0, y_cur + timestep/2.0 * k1);
         T k3 = f(t_cur + timestep/2.0, y_cur + timestep/2.0 * k2);
-        T k4 = f(t_cur + timestep  , y_cur + timestep   * k3);
+        T k4 = f(t_cur + timestep    , y_cur + timestep     * k3);
 
         y_cur = y_cur + timestep/6.0*(k1 + 2.0*k2 + 2.0*k3 + k4);
 
@@ -120,7 +120,7 @@ std::valarray<double> dglfunc_pendel(double /* t */, std::valarray<double> y)
     std::valarray<double> ret(2);
 
     ret[0] = y[1];
-    ret[1] = - params["omega"] * std::sin(y[0]);
+    ret[1] = - params["omega"]*params["omega"] * std::sin(y[0]);
 
     return ret;
 }
