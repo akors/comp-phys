@@ -34,12 +34,11 @@ struct solver_euler
     }
 };
 
+
 template <typename T, typename F> 
 struct solver_RungeKutta4
 {
-    double t_cur;
-    T y_cur; // current t/y values
-    F f; // functor depending on t,y
+
 
     // initializing constructor
     solver_RungeKutta4(const F& func, double t_init, T y_init)
@@ -50,18 +49,31 @@ struct solver_RungeKutta4
     // no default-construction!
     solver_RungeKutta4() = delete;
 
-    T step(double timestep)
+    void step(double timestep)
     {
-        T k1 = f(t_cur               , y_cur                    );
-        T k2 = f(t_cur + timestep/2.0, y_cur + timestep/2.0 * k1);
-        T k3 = f(t_cur + timestep/2.0, y_cur + timestep/2.0 * k2);
-        T k4 = f(t_cur + timestep    , y_cur + timestep     * k3);
+        k1 = f(t_cur               , y_cur                    );
+        k2 = f(t_cur + timestep/2.0, y_cur + timestep/2.0 * k1);
+        k3 = f(t_cur + timestep/2.0, y_cur + timestep/2.0 * k2);
+        k4 = f(t_cur + timestep    , y_cur + timestep     * k3);
 
-        y_cur = y_cur + timestep/6.0*(k1 + 2.0*k2 + 2.0*k3 + k4);
+        y_cur += timestep/6.0*(k1 + 2.0*k2 + 2.0*k3 + k4);
 
         t_cur += timestep;
-        return y_cur;
     }
+    
+    const T& getY() const
+    { return y_cur; }
+    
+    const double& getTime() const
+    { return t_cur; }
+
+private:
+    // store these locally, so we don't have to create the k's on every step
+    T k1, k2, k3, k4;
+
+    double t_cur;
+    T y_cur; // current t/y values
+    F f; // functor depending on t,y
 };
 
 } // namespace cop
