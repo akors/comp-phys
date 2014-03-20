@@ -1,8 +1,7 @@
 set terminal png
      
 set output "03_doublependulum-rk4.png"
-plot "03_doublependulum.dat" using 1:2 title "\\theta (Runge-Kutta 4)" with lines, \
-     "03_doublependulum.dat" using 1:3 title "\\dottheta (Runge-Kutta 4)" with lines, \
-     "03_doublependulum.dat" using 1:4 title "Energy (Runge-Kutta 4)" with lines
-
-
+plot "03_doublependulum.dat" using 1:2 title "\\theta1" with lines, \
+     "03_doublependulum.dat" using 1:3 title "\\theta2" with lines, \
+     "03_doublependulum.dat" using 1:4 title "\\ptilde1" with lines, \
+     "03_doublependulum.dat" using 1:5 title "\\ptilde2" with lines
