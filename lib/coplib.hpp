@@ -8,17 +8,19 @@
 
 namespace cop {
 
-void readParams(std::map<std::string, double>& parms, std::ifstream& parmfile);
+typedef double real_t;
+
+void readParams(std::map<std::string, real_t>& parms, std::ifstream& parmfile);
 
 template <typename T, typename F> 
 struct solver_euler
 {
-    double t_cur;
+    real_t t_cur;
     T y_cur; // current t/y values
     F f; // functor depending on t,y
 
     // initializing constructor
-    solver_euler(const F& func, double t_init, T y_init)
+    solver_euler(const F& func, real_t t_init, T y_init)
         : f(func), t_cur(t_init), y_cur(y_init)
     {     
     }
@@ -26,7 +28,7 @@ struct solver_euler
     // no default-construction!
     solver_euler() = delete;
 
-    T step(double timestep)
+    T step(real_t timestep)
     {
         y_cur = y_cur + f(t_cur, y_cur) * timestep;
         t_cur += timestep;
@@ -41,7 +43,7 @@ struct solver_RungeKutta4
 
 
     // initializing constructor
-    solver_RungeKutta4(const F& func, double t_init, T y_init)
+    solver_RungeKutta4(const F& func, real_t t_init, T y_init)
         : f(func), t_cur(t_init), y_cur(y_init)
     {     
     }
@@ -49,7 +51,7 @@ struct solver_RungeKutta4
     // no default-construction!
     solver_RungeKutta4() = delete;
 
-    void step(double timestep)
+    void step(real_t timestep)
     {
         k1 = f(t_cur               , y_cur                    );
         k2 = f(t_cur + timestep/2.0, y_cur + timestep/2.0 * k1);
@@ -64,14 +66,14 @@ struct solver_RungeKutta4
     const T& getY() const
     { return y_cur; }
     
-    const double& getTime() const
+    const real_t& getTime() const
     { return t_cur; }
 
 private:
     // store these locally, so we don't have to create the k's on every step
     T k1, k2, k3, k4;
 
-    double t_cur;
+    real_t t_cur;
     T y_cur; // current t/y values
     F f; // functor depending on t,y
 };
