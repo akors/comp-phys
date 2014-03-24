@@ -9,9 +9,10 @@
 
 #include "coplib.hpp"
 
+
 // initialize with default paramters
-static std::map<std::string, double> params {
-        {"stepsize", 0.01},
+static std::map<std::string, cop::real_t> params {
+        {"stepsize", 0.001},
         {"resolution", 1},
         {"t_init", 0.0}, // initial conditions
         {"t_end", 50},
@@ -22,17 +23,22 @@ static std::map<std::string, double> params {
         {"omega", 1}
 };
 
-static double omega;
+static cop::real_t omega;
 
-std::valarray<double> dglfunc_doppelpendel(double /* t */, const std::valarray<double>& y)
+#define theta1 y[0]
+#define theta2 y[1]
+#define p1     y[2]
+#define p2     y[3]
+
+std::valarray<cop::real_t> dglfunc_doppelpendel(cop::real_t /* t */, const std::valarray<cop::real_t>& y)
 {
-    std::valarray<double> ret(4);
+    std::valarray<cop::real_t> ret(4);
 
-    double sin_dtheta = std::sin(y[0] - y[1]), cos_dtheta = std::cos(y[0] - y[1]);
+    cop::real_t sin_dtheta = std::sin(y[0] - y[1]), cos_dtheta = std::cos(y[0] - y[1]);
 
-    double A =  (y[2]*y[3]*sin_dtheta) / (1 + sin_dtheta*sin_dtheta);
-    double B =  (y[2]*y[2] + 2*y[3]*y[3] - 2*y[2]*y[3]*cos_dtheta) / 
-                 (1 + sin_dtheta*sin_dtheta)*(1 + sin_dtheta*sin_dtheta) *
+    cop::real_t A =  (y[2]*y[3]*sin_dtheta) / (1 + sin_dtheta*sin_dtheta);
+    cop::real_t B =  (y[2]*y[2] + 2*y[3]*y[3] - 2*y[2]*y[3]*cos_dtheta) / 
+                 ((1 + sin_dtheta*sin_dtheta)*(1 + sin_dtheta*sin_dtheta)) *
                  sin_dtheta*cos_dtheta;
 
     // dottheta_1 
@@ -51,9 +57,12 @@ std::valarray<double> dglfunc_doppelpendel(double /* t */, const std::valarray<d
     return ret;
 }
 
-double energy(std::valarray<double> y)
+cop::real_t energy(std::valarray<cop::real_t> y)
 {
-    return (1 - std::cos(y[0])) + y[1]*y[1]/2;
+    return 
+        0.5*(y[2]*y[2]+ 2*y[3]*y[3] -  2*y[2]*y[3]*std::cos(y[0]-y[1])) / (1+sin(y[0]-y[1])*sin(y[0]-y[1])) +
+        omega*omega * (3 - 2*cos(y[0])-cos(y[1]));
+;
 }
 
 int main()
@@ -74,20 +83,20 @@ int main()
 
 
 	// initialize solver
-    double timestep = params["stepsize"], t_end = params["t_end"];
+    cop::real_t timestep = params["stepsize"], t_end = params["t_end"];
     omega = params["omega"];
-    std::valarray<double> y_init = {
+    std::valarray<cop::real_t> y_init = {
         params["y1_init"], params["y2_init"], params["y3_init"], params["y4_init"]
     };
 
 
-    cop::solver_RungeKutta4<std::valarray<double>, decltype(dglfunc_doppelpendel)*> s_rk4(
+    cop::solver_RungeKutta4<std::valarray<cop::real_t>, decltype(dglfunc_doppelpendel)*> s_rk4(
         dglfunc_doppelpendel, params["t_init"], y_init
     );
 
 	// write header line
 	std::cout<<
-        "Time"<<"  "<<
+        "# Time"<<"  "<<
         "\\theta1"<<"  "<<
         "\\theta2"<<"  "<<
         "\\ptilde1"<<"  "<<
@@ -110,6 +119,7 @@ int main()
             std::cout<<s_rk4.getTime()<<"  "
                 <<s_rk4.getY()[0]<<"  "<<s_rk4.getY()[1]<<"  "
                 <<s_rk4.getY()[2]<<"  "<<s_rk4.getY()[3]<<"  "
+                <<energy(s_rk4.getY())
                 <<'\n';
         }
 
